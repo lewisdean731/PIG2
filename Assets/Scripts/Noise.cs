@@ -9,13 +9,16 @@ public static class Noise
     public static float[,] GenerateNoiseMap(
         int mapWidth,
         int mapHeight,
-        string seed,
-        float scale,
-        int octaves,
-        float persistance,
-        float lacunarity,
-        Vector2 offset)
+        NoiseData noiseData)
     {
+        (string seed,
+        Vector2 offset,
+        float noiseScale, 
+        int octaves, 
+        float persistence, 
+        float lacunarity, 
+        AnimationCurve redistributionCurve) = noiseData;
+
         float[,] noiseMap = new float[mapWidth, mapHeight];
 
         System.Random prng = new System.Random(convertStringSeedToInt(seed));
@@ -28,17 +31,17 @@ public static class Noise
         for (int i = 0; i < octaves; i++)
         {
             float offsetX = prng.Next(-100000, 100000) + offset.x;
-            float offsetY = prng.Next(-100000, 100000) + offset.y;
+            float offsetY = prng.Next(-100000, 100000) - offset.y;
             octaveOffsets[i] = new Vector2(offsetX, offsetY);
 
             maxPossibleHeight += amplitude;
-            amplitude *= persistance;
+            amplitude *= persistence;
         }
 
 
-        if (scale <= 0)
+        if (noiseScale <= 0)
         {
-            scale = 0.0001f;
+            noiseScale = 0.0001f;
         }
 
         float maxLocalNoiseHeight = float.MinValue;
@@ -62,15 +65,15 @@ public static class Noise
                 {
                     // sample points subtract halfWidth / halfHeight so when we change noise scale,
                     // it scales from the center of the noise map instead of the top-righht corner
-                    float sampleX = (x - halfWidth + octaveOffsets[i].x) / scale * frequency;
-                    float sampleY = (y - halfHeight + octaveOffsets[i].y) / scale * frequency;
+                    float sampleX = (x - halfWidth + octaveOffsets[i].x) / noiseScale * frequency;
+                    float sampleY = (y - halfHeight + octaveOffsets[i].y) / noiseScale * frequency;
 
                     float perlinValue = Mathf.PerlinNoise(sampleX, sampleY);
                     perlinValue += perlinValue * 2 - 1; // allows value to be in the range +-1 so noiseHeight may sometimes decrease
 
                     noiseHeight += perlinValue * amplitude;
 
-                    amplitude *= persistance; // decreases each octave
+                    amplitude *= persistence; // decreases each octave
                     frequency *= lacunarity; // increases each octave
                 }
 
@@ -82,6 +85,7 @@ public static class Noise
                 {
                     minLocalNoiseHeight = noiseHeight;
                 }
+
                 noiseMap[x, y] = noiseHeight;
             }
         }
@@ -92,6 +96,19 @@ public static class Noise
             for (int x = 0; x < mapWidth; x++)
             {
                 noiseMap[x, y] = Mathf.InverseLerp(minLocalNoiseHeight, maxLocalNoiseHeight, noiseMap[x, y]);
+            }
+        }
+
+        return noiseMap;
+    }
+
+    public static float[,] RedistributeHeights(float[,] noiseMap, AnimationCurve redistributionCurve)
+    {
+        for (int y = 0; y < noiseMap.GetLength(0); y++)
+        {
+            for (int x = 0; x < noiseMap.GetLength(1); x++)
+            {
+                noiseMap[x, y] = redistributionCurve.Evaluate(noiseMap[x, y]);
             }
         }
 

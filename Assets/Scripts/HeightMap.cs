@@ -6,17 +6,19 @@ using UnityEngine;
 
 public static class HeightMap
 {
-    public static float[,] GenerateHeightMap(NoiseData noiseData)
+    public static float[,] GenerateHeightMap(NoiseData noiseData, TerrainData terrainData)
     {
+        int mapWidth = terrainData.tileCountX * MapMetrics.tileSize;
+        int mapHeight = terrainData.tileCountY * MapMetrics.tileSize;
 
         // generate noise
-        float[,] heightMap = Noise.GenerateNoiseMap(
-            MapMetrics.tileSize,
-            MapMetrics.tileSize,
-            noiseData.seed, noiseData.noiseScale,
-            noiseData.octaves, noiseData.persistence,
-            noiseData.lacunarity,
-            new Vector2(0, 0) + noiseData.offset);
+        float[,] heightMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, noiseData);
+
+        // redistribute height if height curve provided
+        if(noiseData.redistributionCurve != null)
+        {
+            heightMap = Noise.RedistributeHeights(heightMap, noiseData.redistributionCurve);
+        }
 
 
         return heightMap;

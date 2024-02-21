@@ -25,8 +25,13 @@ public class MapDisplay : MonoBehaviour
             g.transform.parent = parent.transform;
             g.transform.localPosition = new Vector3(0, 0, 0);
             // g.transform.Rotate(new Vector3(0, 180, 0));
-            g.transform.localScale = new Vector3(MapMetrics.tileSize / 10, 1, MapMetrics.tileSize / 10);
         }
+
+        // Update scale in case terrain tile counts changed
+        TerrainData td = gameObject.GetComponent<MapGenerator>().terrainData;
+        float xScale = (float)MapMetrics.tileSize / 10 * td.tileCountX;
+        float zScale = (float)MapMetrics.tileSize / 10 * td.tileCountY;
+        g.transform.localScale = new Vector3(xScale, 1, zScale);
 
         return g;
     }

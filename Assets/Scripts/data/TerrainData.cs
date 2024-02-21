@@ -5,7 +5,9 @@ using UnityEngine;
 [CreateAssetMenu]
 public class TerrainData : UpdateableData
 {
+    [Range(1, 32)]
     public int tileCountX = 4;
+    [Range(1, 32)]
     public int tileCountY = 4;
 
     public float scale = 1f;

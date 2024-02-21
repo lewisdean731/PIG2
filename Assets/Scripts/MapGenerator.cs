@@ -18,7 +18,7 @@ public class MapGenerator : MonoBehaviour
     public MapDisplay mapDisplay;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         DrawMap();
     }
@@ -33,7 +33,7 @@ public class MapGenerator : MonoBehaviour
 
     public void DrawMap()
     {
-        float[,] heightMap = HeightMap.GenerateHeightMap(noiseData);
+        float[,] heightMap = HeightMap.GenerateHeightMap(noiseData, terrainData);
 
         switch (drawMode)
         {
