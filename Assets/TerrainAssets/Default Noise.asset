@@ -15,10 +15,11 @@ MonoBehaviour:
   autoUpdate: 1
   seed: ukc
   offset: {x: 0, y: 0}
-  noiseScale: 64
+  noiseScale: 256
   octaves: 4
   persistence: 0.5
   lacunarity: 1.5
+  islandness: 0.5
   redistributionCurve:
     serializedVersion: 2
     m_Curve:

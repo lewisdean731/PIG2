@@ -20,6 +20,10 @@ public static class HeightMap
             heightMap = Noise.RedistributeHeights(heightMap, noiseData.redistributionCurve);
         }
 
+        // use square bump to raise center, lower borders (e.g. make an island)
+        heightMap = Noise.SquareBump(heightMap, noiseData.islandness);
+
+
 
         return heightMap;
     }

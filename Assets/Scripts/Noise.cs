@@ -17,6 +17,7 @@ public static class Noise
         int octaves, 
         float persistence, 
         float lacunarity, 
+        float islandness,
         AnimationCurve redistributionCurve) = noiseData;
 
         float[,] noiseMap = new float[mapWidth, mapHeight];
@@ -104,11 +105,39 @@ public static class Noise
 
     public static float[,] RedistributeHeights(float[,] noiseMap, AnimationCurve redistributionCurve)
     {
-        for (int y = 0; y < noiseMap.GetLength(0); y++)
+        for (int y = 0; y < noiseMap.GetLength(1); y++)
         {
-            for (int x = 0; x < noiseMap.GetLength(1); x++)
+            for (int x = 0; x < noiseMap.GetLength(0); x++)
             {
                 noiseMap[x, y] = redistributionCurve.Evaluate(noiseMap[x, y]);
+            }
+        }
+
+        return noiseMap;
+    }
+
+    public static float[,] SquareBump(float[,] noiseMap, float mix)
+    {
+
+        float width = noiseMap.GetLength(0);
+        float height = noiseMap.GetLength(1);
+        float distance;
+        float nx;
+        float ny;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                // 0 when xy = half width/height
+                // -1 when xy = 0 or 1 when max width/height
+                nx = (float)((2 * x) / width) - 1;
+                ny = (float)((2 * y) / height) - 1;
+
+                // square bump
+                distance = (float)(1 - (1-(nx*nx)) * (1-(ny*ny)));
+
+                noiseMap[x, y] = Mathf.Lerp(noiseMap[x,y], 1-distance, mix);
             }
         }
 

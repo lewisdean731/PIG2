@@ -16,6 +16,9 @@ public class NoiseData : UpdateableData
     public float persistence = 0.5f;
     public float lacunarity = 1.5f;
 
+    [Range(0f, 1f)]
+    public float islandness = 0.5f;
+
     public AnimationCurve redistributionCurve;
 
 #if UNITY_EDITOR
@@ -35,6 +38,7 @@ public class NoiseData : UpdateableData
         out int octaves,
         out float persistence,
         out float lacunarity,
+        out float islandness,
         out AnimationCurve redistributionCurve)
     {
         seed = this.seed;
@@ -43,6 +47,7 @@ public class NoiseData : UpdateableData
         octaves = this.octaves;
         persistence = this.persistence;
         lacunarity = this.lacunarity;
+        islandness = this.islandness;
         redistributionCurve = this.redistributionCurve;
     }
 
