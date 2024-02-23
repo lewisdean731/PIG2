@@ -65,11 +65,13 @@
     <Compile Include="Assets\Scripts\MapMetrics.cs" />
     <Compile Include="Assets\Scripts\data\TerrainData.cs" />
     <Compile Include="Assets\Scripts\MapGenerator.cs" />
+    <Compile Include="Assets\Scripts\data\TemperatureData.cs" />
     <Compile Include="Assets\Scripts\HeightMap.cs" />
     <Compile Include="Assets\Scripts\Noise.cs" />
     <Compile Include="Assets\Scripts\TextureGenerator.cs" />
     <Compile Include="Assets\Scripts\MapDisplay.cs" />
     <Compile Include="Assets\Scripts\data\NoiseData.cs" />
+    <Compile Include="Assets\Scripts\TemperatureMap.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

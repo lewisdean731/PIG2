@@ -51,5 +51,10 @@ public class NoiseData : UpdateableData
         redistributionCurve = this.redistributionCurve;
     }
 
+    public NoiseData ShallowCopy()
+    {
+        return (NoiseData)this.MemberwiseClone();
+    }
+
 #endif
 }

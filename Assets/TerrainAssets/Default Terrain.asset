@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Default Terrain
   m_EditorClassIdentifier: 
   autoUpdate: 1
-  tileCountX: 4
-  tileCountY: 4
+  tileCountX: 16
+  tileCountY: 16
   scale: 1
   heightMultiplier: 1
   heightCurve:

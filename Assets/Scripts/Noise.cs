@@ -136,8 +136,13 @@ public static class Noise
 
                 // square bump
                 distance = (float)(1 - (1-(nx*nx)) * (1-(ny*ny)));
+                
+                if(distance * 1.5f < 0.8)
+                {
+                    //distance *= 1.5f;
+                }
 
-                noiseMap[x, y] = Mathf.Lerp(noiseMap[x,y], 1-distance, mix);
+                noiseMap[x, y] = Mathf.Lerp(noiseMap[x,y], 1 - distance, mix);
             }
         }
 

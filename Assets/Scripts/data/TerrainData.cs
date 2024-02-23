@@ -12,6 +12,9 @@ public class TerrainData : UpdateableData
 
     public float scale = 1f;
 
+    [Range(0, 1)]
+    public float seaLevel = 0.18f;
+
     public float heightMultiplier = 1;
     public AnimationCurve heightCurve;
 
