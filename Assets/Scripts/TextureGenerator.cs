@@ -66,4 +66,22 @@ public class TextureGenerator
 
         return FromColourMap(colourMap, width, height);
     }
+
+    public static Texture2D FromHumiditiyMap(float[,] hMap)
+    {
+        int width = hMap.GetLength(0);
+        int height = hMap.GetLength(1);
+
+        Color[] colourMap = new Color[width * height];
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                colourMap[y * width + x] = Color.Lerp(Color.white, Color.blue, hMap[x,y]);
+            }
+        }
+
+        return FromColourMap(colourMap, width, height);
+    }
 }
+

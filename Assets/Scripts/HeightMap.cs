@@ -6,7 +6,7 @@ using UnityEngine;
 
 public static class HeightMap
 {
-    public static (float[,], float[,]) GenerateHeightMap(NoiseData noiseData, TerrainData terrainData, TemperatureData temperatureData)
+    public static (float[,], float[,], float[,]) GenerateTerrainMaps(NoiseData noiseData, TerrainData terrainData, TemperatureData temperatureData)
     {
         int mapWidth = terrainData.tileCountX * MapMetrics.tileSize;
         int mapHeight = terrainData.tileCountY * MapMetrics.tileSize;
@@ -23,15 +23,13 @@ public static class HeightMap
         // use square bump to raise center, lower borders (e.g. make an island)
         heightMap = Noise.SquareBump(heightMap, noiseData.islandness);
 
-        // generate moisture noise
-        NoiseData moistureNoiseData = noiseData.ShallowCopy();
-        /*moistureNoiseData.noiseScale *= 2;
-        moistureNoiseData.octaves /= 2;
-        float[,] moistureMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, moistureNoiseData);*/
 
         // generate temperature map
-        float[,] temperatureMap = TemperatureMap.GenerateTemperatureMap(heightMap, terrainData, temperatureData);
+        (float[,] temperatureMap, float[,] temperatureMap01) = TemperatureMap.GenerateTemperatureMaps(heightMap, terrainData, temperatureData);
 
-        return (heightMap, temperatureMap);
+        // generate humidity map
+        float[,] humidityMap = HumidityMap.GenerateHumidityMap(heightMap, temperatureMap01, noiseData, terrainData, temperatureData);
+
+        return (heightMap, temperatureMap, humidityMap);
     }
 }

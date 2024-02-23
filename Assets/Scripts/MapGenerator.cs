@@ -19,7 +19,7 @@ public class MapGenerator : MonoBehaviour
     [SerializeField]
 
     public float[] debugMapValues;
-    public enum DrawMode { ColorMap, HeightMap, HeightMapRGB, TemperatureMap, EquatorMap };
+    public enum DrawMode { ColorMap, HeightMap, HeightMapRGB, TemperatureMap, EquatorMap, HumidityMap };
     public DrawMode drawMode;
     
     public bool autoUpdate;
@@ -40,18 +40,7 @@ public class MapGenerator : MonoBehaviour
 
     public void DrawMap()
     {
-        (float[,] heightMap, float[,] temperatureMap) = HeightMap.GenerateHeightMap(noiseData, terrainData, temperatureData);
-
-        // debugMapValues = new float[heightMap.GetLength(0) * heightMap.GetLength(1)];
-        debugMapValues = new float[heightMap.GetLength(1)];
-        for (int i = 0; i < heightMap.GetLength(1); i++)
-        {
-            //for(int j = 0; j < heightMap.GetLength(1) - 511; j++)
-            //{
-            //    debugMapValues[i * j + j] = heightMap[i,j];
-            //}
-            debugMapValues[i] = heightMap[0, i];
-        }
+        (float[,] heightMap, float[,] temperatureMap, float[,] humidityMap) = HeightMap.GenerateTerrainMaps(noiseData, terrainData, temperatureData);
 
         switch (drawMode)
         {
@@ -71,6 +60,9 @@ public class MapGenerator : MonoBehaviour
             case DrawMode.EquatorMap:
                 Debug.Log("Draw EquatorMap not implemented");
                 // mapDisplay.DrawTexture(TextureGenerator.FromEquatorMap(heightMap, temperatureData));
+                break;
+            case DrawMode.HumidityMap:
+                mapDisplay.DrawTexture(TextureGenerator.FromHumiditiyMap(humidityMap));
                 break;
             default:
                 break;

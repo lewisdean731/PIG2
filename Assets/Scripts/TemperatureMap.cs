@@ -8,7 +8,7 @@ using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public static class TemperatureMap
 {
-    public static float[,] GenerateTemperatureMap(float[,] heightMap, TerrainData terrData, TemperatureData tempData)
+    public static (float[,], float[,]) GenerateTemperatureMaps(float[,] heightMap, TerrainData terrData, TemperatureData tempData)
     {
 
         // Generate equator temperature map
@@ -18,9 +18,9 @@ public static class TemperatureMap
         float[,] temperatureMap01 = ApplyTerrainTemperatureEffects(equatorMap, heightMap, tempData, terrData);
 
         // Convert to real temperatures
-        float[,] temperatureMap = ConvertToRealTemperatures(temperatureMap01, tempData);
+        float[,] temperatureMap = ToRealTemperatures(temperatureMap01, tempData);
 
-        return temperatureMap;
+        return (temperatureMap, temperatureMap01);
     }
     
     public static float[,] GenerateEquatorMap(float[,] heightMap, TemperatureData temperatureData)
@@ -73,8 +73,6 @@ public static class TemperatureMap
                 float elevation01 = heightMap[x, y];
                 float temperature01 = equatorMap[x, y];
 
-                float tempReductionFactor = elevation01 * 2 / (tempData.minTemperatureC - tempData.maxTemperatureC);
-
                 temperatureMap[x, y] = temperature01 - elevation01 / 2;
             }
         }
@@ -82,7 +80,7 @@ public static class TemperatureMap
         return temperatureMap;
     }
 
-    public static float[,] ConvertToRealTemperatures(float[,] tempMap01, TemperatureData tempData)
+    public static float[,] ToRealTemperatures(float[,] tempMap01, TemperatureData tempData)
     {
         int width = tempMap01.GetLength(0);
         int height = tempMap01.GetLength(1);
@@ -100,6 +98,26 @@ public static class TemperatureMap
         }
 
         return temperatureMap;
+    }
+
+    public static float[,] To01Map(float[,] tempMap01, TemperatureData tempData)
+    {
+        int width = tempMap01.GetLength(0);
+        int height = tempMap01.GetLength(1);
+
+        float[,] temperatureMap01 = new float[width, height];
+
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                // Scale temperature between 0-1
+                temperatureMap01[x,y] = Mathf.InverseLerp(tempData.minTemperatureC, tempData.maxTemperatureC, tempMap01[x, y]);
+            }
+        }
+
+        return temperatureMap01;
     }
 
 }
