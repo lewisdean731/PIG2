@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class HumidityMap
 {
-    public static float[,] GenerateHumidityMap(float[,] heightMap, float[,] tempMap01, NoiseData noiseData, TerrainData terData, TemperatureData tempData)
+    public static float[,] GenerateHumidityMap(float[,] heightMap, float[,] tempMap01, NoiseData noiseData, TerrainData terrData, TemperatureData tempData)
     {
         int width = heightMap.GetLength(0);
         int height = heightMap.GetLength(1);
@@ -13,7 +13,7 @@ public static class HumidityMap
 
         // Generate noise
         NoiseData hNoise = noiseData.ShallowCopy();
-        hNoise.noiseScale += 2;
+        hNoise.noiseScale *= 2;
         hNoise.octaves = 2;
         hNoise.lacunarity = 1;
         humidityMap = Noise.GenerateNoiseMap(width, height, hNoise);
@@ -24,7 +24,21 @@ public static class HumidityMap
         // Apply temperature effects
         humidityMap = ApplyTemperatureEffects(humidityMap, tempMap01);
 
-        // ...
+        // conform to min/max values
+        humidityMap = ApplyMinMax(humidityMap, tempData);
+
+        return humidityMap;
+    }
+
+    public static float[,] ApplyMinMax(float[,] humidityMap, TemperatureData tempData)
+    {
+        for (int y = 0; y < humidityMap.GetLength(1); y++)
+        {
+            for (int x = 0; x < humidityMap.GetLength(0); x++)
+            {
+                humidityMap[x, y] = Mathf.Lerp(tempData.minHumidity, tempData.maxHumidity, humidityMap[x, y]) ;
+            }
+        }
 
         return humidityMap;
     }
@@ -38,7 +52,7 @@ public static class HumidityMap
                 // Higher temperature = lower humidity
                 float temperature01 = temperatureMap01[x, y];
 
-                humidityMap[x, y] -= temperature01 / 2;
+                humidityMap[x, y] -= temperature01 / 4;
             }
         }
 
@@ -54,7 +68,7 @@ public static class HumidityMap
                 // Higher temperature = lower humidity
                 float elevation01 = heightMap[x, y];
 
-                humidityMap[x, y] -= elevation01 / 2;
+                humidityMap[x, y] -= elevation01 / 4;
             }
         }
 

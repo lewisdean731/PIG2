@@ -6,7 +6,7 @@ using UnityEngine;
 
 public static class HeightMap
 {
-    public static (float[,], float[,], float[,]) GenerateTerrainMaps(NoiseData noiseData, TerrainData terrainData, TemperatureData temperatureData)
+    public static (float[,], float[,], float[,], float[,], BiomeType[,]) GenerateTerrainMaps(NoiseData noiseData, TerrainData terrainData, TemperatureData temperatureData, BiomesData biomeData)
     {
         int mapWidth = terrainData.tileCountX * MapMetrics.tileSize;
         int mapHeight = terrainData.tileCountY * MapMetrics.tileSize;
@@ -30,6 +30,14 @@ public static class HeightMap
         // generate humidity map
         float[,] humidityMap = HumidityMap.GenerateHumidityMap(heightMap, temperatureMap01, noiseData, terrainData, temperatureData);
 
-        return (heightMap, temperatureMap, humidityMap);
+        // hydraulic erosion
+        //
+        // TODO ...
+        //
+
+        // generate biomes
+        BiomeType[,] biomeMap = BiomeMap.GenerateBiomeMap(heightMap, temperatureMap01, humidityMap, noiseData, terrainData, temperatureData, biomeData);
+
+        return (heightMap, temperatureMap, temperatureMap01, humidityMap, biomeMap);
     }
 }

@@ -18,7 +18,7 @@ public static class TemperatureMap
         float[,] temperatureMap01 = ApplyTerrainTemperatureEffects(equatorMap, heightMap, tempData, terrData);
 
         // Convert to real temperatures
-        float[,] temperatureMap = ToRealTemperatures(temperatureMap01, tempData);
+        float[,] temperatureMap = ToTempC(temperatureMap01, tempData);
 
         return (temperatureMap, temperatureMap01);
     }
@@ -73,14 +73,18 @@ public static class TemperatureMap
                 float elevation01 = heightMap[x, y];
                 float temperature01 = equatorMap[x, y];
 
-                temperatureMap[x, y] = temperature01 - elevation01 / 2;
+                temperatureMap[x, y] = temperature01 - (elevation01 * elevation01);
             }
         }
 
         return temperatureMap;
     }
 
-    public static float[,] ToRealTemperatures(float[,] tempMap01, TemperatureData tempData)
+    public static float ToTempC(float temp01, TemperatureData tempData)
+    {
+        return Mathf.Lerp(tempData.minTemperatureC, tempData.maxTemperatureC, temp01); ;
+    }
+    public static float[,] ToTempC(float[,] tempMap01, TemperatureData tempData)
     {
         int width = tempMap01.GetLength(0);
         int height = tempMap01.GetLength(1);
@@ -93,7 +97,7 @@ public static class TemperatureMap
             for (int x = 0; x < width; x++)
             {
                 // Scale 0-1 values into real temperatures between given min/max
-                temperatureMap[x, y] = Mathf.Lerp(tempData.minTemperatureC, tempData.maxTemperatureC, tempMap01[x, y]);
+                temperatureMap[x, y] = ToTempC(tempMap01[x, y], tempData);
             }
         }
 

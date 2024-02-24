@@ -11,6 +11,7 @@ public class MapGenerator : MonoBehaviour
     public NoiseData noiseData;
     public TerrainData terrainData;
     public TemperatureData temperatureData;
+    public BiomesData biomesData;
 
     public Material terrainMaterial;
 
@@ -19,7 +20,7 @@ public class MapGenerator : MonoBehaviour
     [SerializeField]
 
     public float[] debugMapValues;
-    public enum DrawMode { ColorMap, HeightMap, HeightMapRGB, TemperatureMap, EquatorMap, HumidityMap };
+    public enum DrawMode { ColorMap, HeightMap, HeightMapRGB, TemperatureMap, EquatorMap, HumidityMap, RawBiomeMap, BiomeMap };
     public DrawMode drawMode;
     
     public bool autoUpdate;
@@ -40,7 +41,7 @@ public class MapGenerator : MonoBehaviour
 
     public void DrawMap()
     {
-        (float[,] heightMap, float[,] temperatureMap, float[,] humidityMap) = HeightMap.GenerateTerrainMaps(noiseData, terrainData, temperatureData);
+        (float[,] heightMap, float[,] temperatureMap, float[,] temperatureMap01, float[,] humidityMap, BiomeType[,] biomeMap) = HeightMap.GenerateTerrainMaps(noiseData, terrainData, temperatureData, biomesData);
 
         switch (drawMode)
         {
@@ -63,6 +64,12 @@ public class MapGenerator : MonoBehaviour
                 break;
             case DrawMode.HumidityMap:
                 mapDisplay.DrawTexture(TextureGenerator.FromHumiditiyMap(humidityMap));
+                break;
+            case DrawMode.RawBiomeMap:
+                mapDisplay.DrawTexture(TextureGenerator.FromRawBiomeMap(biomeMap, biomesData));
+                break;
+            case DrawMode.BiomeMap:
+                mapDisplay.DrawTexture(TextureGenerator.FromBiomeMap(biomeMap, biomesData, humidityMap, temperatureMap01));
                 break;
             default:
                 break;
@@ -87,6 +94,11 @@ public class MapGenerator : MonoBehaviour
         {
             temperatureData.onValuesUpdated -= OnValuesUpdated;
             temperatureData.onValuesUpdated += OnValuesUpdated;
+        }
+        if (biomesData != null)
+        {
+            biomesData.onValuesUpdated -= OnValuesUpdated;
+            biomesData.onValuesUpdated += OnValuesUpdated;
         }
     }
 }

@@ -83,5 +83,76 @@ public class TextureGenerator
 
         return FromColourMap(colourMap, width, height);
     }
+
+    public static Texture2D FromBiomeMap(BiomeType[,] bMap, BiomesData bData, float[,] hMap, float[,] tMap01)
+    {
+        int width = bMap.GetLength(0);
+        int height = bMap.GetLength(1);
+
+        Color[] colourMap = new Color[width * height];
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                BiomeType biomeType = bMap[x,y];
+
+                Biome biome = null;
+
+                foreach(Biome b in bData.biomes)
+                {
+                    if(b.biomeType == biomeType)
+                    {
+                        biome = b;
+                    }
+                }
+
+                if(biome == null)
+                {
+                    throw new UnassignedReferenceException("Biome not found");
+                }
+
+                // get colour at humidity / temp
+                float htValue = biome.gradientEvaluator == GradientEvaluator.Humidity ? hMap[x, y] : tMap01[x, y];
+                colourMap[y * width + x] = biome.humidityGradient.Evaluate(htValue);
+            }
+        }
+
+        return FromColourMap(colourMap, width, height);
+    }
+
+    public static Texture2D FromRawBiomeMap(BiomeType[,] bMap, BiomesData bData)
+    {
+        int width = bMap.GetLength(0);
+        int height = bMap.GetLength(1);
+
+        Color[] colourMap = new Color[width * height];
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                BiomeType biomeType = bMap[x, y];
+
+                Biome biome = null;
+
+                foreach (Biome b in bData.biomes)
+                {
+                    if (b.biomeType == biomeType)
+                    {
+                        biome = b;
+                    }
+                }
+
+                if (biome == null)
+                {
+                    throw new UnassignedReferenceException("Biome not found");
+                }
+
+                // get colour at 50% humidity
+                colourMap[y * width + x] = biome.humidityGradient.Evaluate(0.5f);
+            }
+        }
+
+        return FromColourMap(colourMap, width, height);
+    }
 }
 
