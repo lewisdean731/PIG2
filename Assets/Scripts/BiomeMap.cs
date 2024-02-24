@@ -4,6 +4,22 @@ using UnityEngine;
 
 public static class BiomeMap
 {
+    class BiomeElegibility
+    {
+        public Biome biome;
+        public float heightScore;
+        public float tempScore;
+        public float humidityScore;
+
+        public BiomeElegibility (Biome biome, float heightScore, float tempScore, float humidityScore)
+        {
+            this.biome = biome;
+            this.heightScore = heightScore;
+            this.tempScore = tempScore;
+            this.humidityScore = humidityScore;
+        }
+    }
+
     public static BiomeType[,] GenerateBiomeMap(float[,] heightMap, float[,] tempMap01, float[,] humidityMap, NoiseData noiseData, TerrainData terData, TemperatureData tempData, BiomesData biomeData)
     {
         int width = heightMap.GetLength(0);
@@ -11,6 +27,9 @@ public static class BiomeMap
 
         BiomeType[,] biomeMap = new BiomeType[width,height];
 
+        float heightWeighting = 0.5f;
+        float tempWeighting = 0.1f;
+        float humidityWeighting = 0.4f;
 
         for (int y = 0; y < height; y++)
         {
@@ -20,25 +39,50 @@ public static class BiomeMap
                 float temperatureC = TemperatureMap.ToTempC(tempMap01[x, y], tempData);
                 float humidity01 = humidityMap[x, y];
 
-                Biome bestBiome = biomeData.biomes[0];
+                List<BiomeElegibility> elegibleBiomes = new List<BiomeElegibility>();
 
-                // Get applicable biome types
+                // Get elegible biomes
                 foreach (Biome biome in biomeData.biomes)
                 {
-
-                    if(elevation01 > biome.fromHeight && biome.fromHeight >= bestBiome.fromHeight)
+                    if(elevation01 > biome.fromHeight)
                     {
-                        if(temperatureC > biome.fromTempC && biome.fromTempC >= bestBiome.fromTempC)
+                        if(temperatureC > biome.fromTempC)
                         {
-                            if(humidity01 > biome.fromHumidity && biome.fromHumidity >= bestBiome.fromHumidity)
+                            if(humidity01 > biome.fromHumidity)
                             {
-                                bestBiome = biome;
+                                elegibleBiomes.Add(new BiomeElegibility(
+                                    biome,
+                                    biome.fromHeight - elevation01,
+                                    biome.fromTempC - temperatureC,
+                                    biome.fromHumidity - humidity01
+                                ));
                             }
                         }
                     }
                 }
 
-                biomeMap[x, y] = bestBiome.biomeType;
+                if(elegibleBiomes[0] == null)
+                {
+                    biomeMap[x, y] = biomeData.biomes[0].biomeType;
+                    break;
+                }
+
+                // Determine best biome
+                BiomeElegibility bestBiome = elegibleBiomes[0];
+
+                foreach (BiomeElegibility be in elegibleBiomes)
+                {
+                    float heightScoreDiff = (be.heightScore - bestBiome.heightScore) * heightWeighting;
+                    float tempScoreDiff = (be.tempScore - bestBiome.tempScore) * tempWeighting;
+                    float humiditytScoreDiff = (be.humidityScore - bestBiome.humidityScore) * humidityWeighting;
+
+                    if(heightScoreDiff + tempScoreDiff + humiditytScoreDiff > 0)
+                    {
+                        bestBiome = be;
+                    }
+                }
+
+                biomeMap[x, y] = bestBiome.biome.biomeType;
             }
         }
 

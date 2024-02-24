@@ -135,7 +135,7 @@ public static class Noise
                 ny = (float)((2 * y) / height) - 1;
 
                 // square bump
-                distance = (float)(1 - (1-(nx*nx)) * (1-(ny*ny)));
+                distance = Mathf.Pow((float)(1 - (1-(nx*nx)) * (1-(ny*ny))), 0.2f);
                 
                 if(distance * 1.5f < 0.8)
                 {

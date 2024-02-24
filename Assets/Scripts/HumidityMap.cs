@@ -13,7 +13,7 @@ public static class HumidityMap
 
         // Generate noise
         NoiseData hNoise = noiseData.ShallowCopy();
-        hNoise.noiseScale *= 2;
+        hNoise.noiseScale /= 2;
         hNoise.octaves = 2;
         hNoise.lacunarity = 1;
         humidityMap = Noise.GenerateNoiseMap(width, height, hNoise);

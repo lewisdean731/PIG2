@@ -12,14 +12,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a0e9fcf9cce2764d9b78cde89c587fc, type: 3}
   m_Name: Default Temperature
   m_EditorClassIdentifier: 
-  autoUpdate: 0
+  autoUpdate: 1
   minTemperatureC: -10
   maxTemperatureC: 35
-  temperatureDistributionCurve:
+  minHumidity: 0.2
+  maxHumidity: 0.9
+  equatorPos: {x: 512, y: 512}
+  equatorRot: 0
+  equatorTransition: 1
+  debugTempVisualisation:
     serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  equatorPos: {x: 128, y: 128}
-  equatorRot: 90
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 0, g: 0, b: 1, a: 1}
+    key2: {r: 0, g: 1, b: 0.6117647, a: 1}
+    key3: {r: 0.6117647, g: 1, b: 0, a: 1}
+    key4: {r: 1, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 3277
+    ctime2: 13107
+    ctime3: 32768
+    ctime4: 58982
+    ctime5: 65535
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 65535
+    atime3: 65535
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: 0
+    m_NumColorKeys: 6
+    m_NumAlphaKeys: 2

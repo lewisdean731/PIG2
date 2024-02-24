@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Default Terrain
   m_EditorClassIdentifier: 
   autoUpdate: 1
-  tileCountX: 16
-  tileCountY: 16
+  tileCountX: 4
+  tileCountY: 4
   scale: 1
+  seaLevel: 0.18
   heightMultiplier: 1
   heightCurve:
     serializedVersion: 2
