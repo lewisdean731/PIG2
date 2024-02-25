@@ -16,10 +16,11 @@ public class NoiseData : UpdateableData
     public float persistence = 0.5f;
     public float lacunarity = 1.5f;
 
-    [Range(0f, 1f)]
-    public float islandness = 0.5f;
-
     public AnimationCurve redistributionCurve;
+    public NoiseData ShallowCopy()
+    {
+        return (NoiseData)this.MemberwiseClone();
+    }
 
 #if UNITY_EDITOR
     protected override void OnValidate()
@@ -29,31 +30,6 @@ public class NoiseData : UpdateableData
             lacunarity = 1;
         }
         base.OnValidate();
-    }
-
-    public void Deconstruct(
-        out string seed,
-        out Vector2 offset,
-        out float noiseScale,
-        out int octaves,
-        out float persistence,
-        out float lacunarity,
-        out float islandness,
-        out AnimationCurve redistributionCurve)
-    {
-        seed = this.seed;
-        offset = this.offset;
-        noiseScale = this.noiseScale;
-        octaves = this.octaves;
-        persistence = this.persistence;
-        lacunarity = this.lacunarity;
-        islandness = this.islandness;
-        redistributionCurve = this.redistributionCurve;
-    }
-
-    public NoiseData ShallowCopy()
-    {
-        return (NoiseData)this.MemberwiseClone();
     }
 
 #endif

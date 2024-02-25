@@ -474,7 +474,7 @@ MonoBehaviour:
       serializedVersion: 2
       key0: {r: 0.14404592, g: 0.2830189, b: 0.0977216, a: 1}
       key1: {r: 0.18811144, g: 0.2679245, b: 0.15721604, a: 1}
-      key2: {r: 0, g: 0, b: 0, a: 0}
+      key2: {r: 0.18811144, g: 0.2679245, b: 0.15721604, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
       key5: {r: 0, g: 0, b: 0, a: 0}
@@ -482,7 +482,7 @@ MonoBehaviour:
       key7: {r: 0, g: 0, b: 0, a: 0}
       ctime0: 6554
       ctime1: 58982
-      ctime2: 0
+      ctime2: 58982
       ctime3: 0
       ctime4: 0
       ctime5: 0
@@ -502,8 +502,8 @@ MonoBehaviour:
       m_NumAlphaKeys: 2
     gradientEvaluator: 0
     fromHeight: 0.2
-    fromTempC: 20
-    fromHumidity: 0.5
+    fromTempC: 30
+    fromHumidity: 0.7
   - biomeType: 14
     humidityGradient:
       serializedVersion: 2

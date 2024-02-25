@@ -14,7 +14,6 @@ public class TextureGenerator
         texture.Apply();
         return texture;
     }
-
     public static Texture2D FromHeightMap(float[,] heightMap)
     {
         int width = heightMap.GetLength(0);
@@ -26,6 +25,37 @@ public class TextureGenerator
             for (int x = 0; x < width; x++)
             {
                 colourMap[y * width + x] = Color.Lerp(Color.black, Color.white, heightMap[x, y]);
+            }
+        }
+
+        return FromColourMap(colourMap, width, height);
+    }
+
+    public static Texture2D WaterMouintainMap(float[,] heightMap, TerrainData tData)
+    {
+        int width = heightMap.GetLength(0);
+        int height = heightMap.GetLength(1);
+
+        Color[] colourMap = new Color[width * height];
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if(heightMap[x, y] <= tData.seaLevel)
+                {
+                    float depth = Mathf.InverseLerp(0, tData.seaLevel, heightMap[x, y]);
+                    colourMap[y * width + x] = Color.Lerp(Color.blue, Color.cyan, depth);
+                } else
+                if (heightMap[x, y] >= 0.7f)
+                {
+                    float depth = Mathf.InverseLerp(0.7f, 1, heightMap[x, y]);
+                    colourMap[y * width + x] = Color.Lerp(Color.yellow, Color.red, depth);
+                }
+                else
+                {
+                    float altitude = Mathf.InverseLerp(tData.seaLevel, 1, heightMap[x, y]);
+                    colourMap[y * width + x] = Color.Lerp(Color.black, Color.white, altitude);
+                }
             }
         }
 

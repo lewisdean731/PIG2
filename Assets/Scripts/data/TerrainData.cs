@@ -18,6 +18,8 @@ public class TerrainData : UpdateableData
     public float heightMultiplier = 1;
     public AnimationCurve heightCurve;
 
+    public IslandInfo islandInfo;
+
     public float minHeight
     {
         get
@@ -32,4 +34,15 @@ public class TerrainData : UpdateableData
             return scale * heightMultiplier * heightCurve.Evaluate(1);
         }
     }
+}
+
+[System.Serializable]
+public class IslandInfo
+{
+    public bool isIsland = true;
+
+    [Range(0f, 1f)]
+    public float size = 0.6f;
+    [Range(0f, 1f)]
+    public float roundness = 0.6f;
 }

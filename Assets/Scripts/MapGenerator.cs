@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.AssetImporters;
 using UnityEngine;
-using static UnityEditor.U2D.ScriptablePacker;
 
 public class MapGenerator : MonoBehaviour
 {
@@ -19,8 +18,18 @@ public class MapGenerator : MonoBehaviour
 
     [SerializeField]
 
-    public float[] debugMapValues;
-    public enum DrawMode { ColorMap, HeightMap, HeightMapRGB, TemperatureMap, EquatorMap, HumidityMap, RawBiomeMap, BiomeMap };
+    public TerrainMaps terrainMaps;
+    public enum DrawMode { 
+        ColorMap,
+        HeightMap,
+        HeightMapRGB,
+        TemperatureMap,
+        EquatorMap,
+        HumidityMap,
+        RawBiomeMap,
+        BiomeMap,
+        WaterMouintainMap
+    };
     public DrawMode drawMode;
     
     public bool autoUpdate;
@@ -41,7 +50,8 @@ public class MapGenerator : MonoBehaviour
 
     public void DrawMap()
     {
-        (float[,] heightMap, float[,] temperatureMap, float[,] temperatureMap01, float[,] humidityMap, BiomeType[,] biomeMap) = HeightMap.GenerateTerrainMaps(noiseData, terrainData, temperatureData, biomesData);
+        terrainMaps = GenerateTerrainMaps(noiseData, terrainData, temperatureData, biomesData);
+        (float[,] heightMap, float[,] temperatureMap, float[,] temperatureMap01, float[,] humidityMap, BiomeType[,] biomeMap) = terrainMaps;
 
         switch (drawMode)
         {
@@ -71,9 +81,55 @@ public class MapGenerator : MonoBehaviour
             case DrawMode.BiomeMap:
                 mapDisplay.DrawTexture(TextureGenerator.FromBiomeMap(biomeMap, biomesData, humidityMap, temperatureMap01));
                 break;
+            case DrawMode.WaterMouintainMap:
+                mapDisplay.DrawTexture(TextureGenerator.WaterMouintainMap(heightMap, terrainData));
+                break;
             default:
                 break;
         }
+    }
+
+    public TerrainMaps GenerateTerrainMaps(NoiseData noiseData, TerrainData terrainData, TemperatureData temperatureData, BiomesData biomeData)
+    {
+        int mapWidth = terrainData.tileCountX * MapMetrics.tileSize;
+        int mapHeight = terrainData.tileCountY * MapMetrics.tileSize;
+
+        // initialise maps
+        TerrainMaps terrainMaps = new TerrainMaps(mapWidth, mapHeight);
+        (
+            float[,] heightMap,
+            float[,] temperatureMap,
+            float[,] temperatureMap01,
+            float[,] humidityMap,
+            BiomeType[,] biomeMap
+        ) = terrainMaps;
+
+        // generate height noise
+        heightMap = HeightMap.GenerateHeightMap(noiseData, terrainData);
+
+
+        // generate temperature map
+        (temperatureMap, temperatureMap01) = TemperatureMap.GenerateTemperatureMaps(heightMap, terrainData, temperatureData);
+
+        // generate humidity map
+        humidityMap = HumidityMap.GenerateHumidityMap(heightMap, temperatureMap01, noiseData, terrainData, temperatureData);
+
+        // hydraulic erosion
+        //
+        // TODO ...
+        //
+
+        // generate biomes
+        biomeMap = BiomeMap.GenerateBiomeMap(heightMap, temperatureMap01, humidityMap, noiseData, terrainData, temperatureData, biomeData);
+
+        // restructure;
+        terrainMaps.heightMap = heightMap;
+        terrainMaps.temperatureMap = temperatureMap;
+        terrainMaps.temperatureMap01 = temperatureMap01;
+        terrainMaps.humidityMap = humidityMap;
+        terrainMaps.biomeMap = biomeMap;
+
+        return terrainMaps;
     }
 
     void OnValidate()

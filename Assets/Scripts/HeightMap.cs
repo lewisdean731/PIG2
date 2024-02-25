@@ -6,13 +6,18 @@ using UnityEngine;
 
 public static class HeightMap
 {
-    public static (float[,], float[,], float[,], float[,], BiomeType[,]) GenerateTerrainMaps(NoiseData noiseData, TerrainData terrainData, TemperatureData temperatureData, BiomesData biomeData)
+    public static float[,] GenerateHeightMap(NoiseData noiseData, TerrainData terrainData)
     {
         int mapWidth = terrainData.tileCountX * MapMetrics.tileSize;
         int mapHeight = terrainData.tileCountY * MapMetrics.tileSize;
 
         // generate height noise
         float[,] heightMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, noiseData);
+
+
+        // add mountain ridges
+        float[,] ridgeMap = GenerateRidgeMap(mapWidth, mapHeight, noiseData);
+        heightMap = Noise.BlendNoiseMaps(heightMap, ridgeMap, BlendType.Add);
 
         // redistribute height if height curve provided
         if(noiseData.redistributionCurve != null)
@@ -21,23 +26,33 @@ public static class HeightMap
         }
 
         // use square bump to raise center, lower borders (e.g. make an island)
-        heightMap = Noise.SquareBump(heightMap, noiseData.islandness);
+        heightMap = Noise.SquareBump(heightMap, terrainData);
+
+        return heightMap;
+    }
+
+    public static float[,] GenerateRidgeMap(int width, int height, NoiseData noiseData)
+    {
+
+        // generate mountain ridge map
+        NoiseData ridgeNoiseData = noiseData.ShallowCopy();
+        ridgeNoiseData.noiseScale *= 2;
+        ridgeNoiseData.lacunarity = 2.5f;
+        ridgeNoiseData.persistence = 0.8f;
+        float[,] ridgeMap = Noise.GenerateNoiseMap(width, height, ridgeNoiseData, true);
+
+        // generate ridge zone map
+        NoiseData ridgeZoneNoiseData = noiseData.ShallowCopy();
+        ridgeZoneNoiseData.noiseScale *= 3;
+        ridgeZoneNoiseData.octaves = 2;
+        ridgeZoneNoiseData.lacunarity = 1.5f;
+        ridgeNoiseData.persistence = 0;
+        float[,] ridgeZoneMap = Noise.GenerateNoiseMap(width, height, ridgeZoneNoiseData);
+
+        // scale rides by zone map
+        ridgeMap = Noise.BlendNoiseMaps(ridgeMap, ridgeZoneMap, BlendType.Multiply);
 
 
-        // generate temperature map
-        (float[,] temperatureMap, float[,] temperatureMap01) = TemperatureMap.GenerateTemperatureMaps(heightMap, terrainData, temperatureData);
-
-        // generate humidity map
-        float[,] humidityMap = HumidityMap.GenerateHumidityMap(heightMap, temperatureMap01, noiseData, terrainData, temperatureData);
-
-        // hydraulic erosion
-        //
-        // TODO ...
-        //
-
-        // generate biomes
-        BiomeType[,] biomeMap = BiomeMap.GenerateBiomeMap(heightMap, temperatureMap01, humidityMap, noiseData, terrainData, temperatureData, biomeData);
-
-        return (heightMap, temperatureMap, temperatureMap01, humidityMap, biomeMap);
+        return (ridgeMap);
     }
 }

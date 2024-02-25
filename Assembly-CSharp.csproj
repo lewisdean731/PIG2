@@ -67,6 +67,7 @@
     <Compile Include="Assets\Scripts\MapGenerator.cs" />
     <Compile Include="Assets\Scripts\data\TemperatureData.cs" />
     <Compile Include="Assets\Scripts\MoistureMap.cs" />
+    <Compile Include="Assets\Scripts\TerrainMaps.cs" />
     <Compile Include="Assets\Scripts\HeightMap.cs" />
     <Compile Include="Assets\Scripts\Noise.cs" />
     <Compile Include="Assets\Scripts\BiomeMap.cs" />

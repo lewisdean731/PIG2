@@ -61,10 +61,14 @@ public static class BiomeMap
                     }
                 }
 
-                if(elegibleBiomes[0] == null)
+                if (elegibleBiomes.Count == 0)
                 {
-                    biomeMap[x, y] = biomeData.biomes[0].biomeType;
-                    break;
+                    elegibleBiomes.Add(new BiomeElegibility(
+                        biomeData.biomes[0],
+                        99,
+                        99,
+                        99
+                    ));
                 }
 
                 // Determine best biome
