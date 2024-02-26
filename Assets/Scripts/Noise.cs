@@ -10,7 +10,9 @@ public enum BlendType
     Divide,
     Multiply,
     Add,
-    Subtract
+    Subtract,
+    Lighten,
+    Darken,
 }
 public static class Noise
 {
@@ -80,7 +82,7 @@ public static class Noise
                         noiseHeight = RidgeNoise(noiseHeight);
                     }
 
-                    //noiseHeight *= 1.75f;
+                    // noiseHeight *= 1.75f;
 
                     amplitude *= nData.persistence; // decreases each octave
                     frequency *= nData.lacunarity; // increases each octave
@@ -164,7 +166,7 @@ public static class Noise
 
     public static float RidgeNoise(float elevation)
     {
-        return 2 * (0.5f - Mathf.Abs(0.5f - elevation)) * -2;
+        return 2 * Mathf.Abs(0.5f - Mathf.Abs(elevation - 0.5f));
     }
 
     /// <summary>
@@ -191,6 +193,12 @@ public static class Noise
                         break;
                     case BlendType.Divide:
                         blendedMap[x, y] = map1[x, y] /= Mathf.Pow(map2[x, y], modifier);
+                        break;
+                    case BlendType.Lighten:
+                        blendedMap[x, y] = map1[x, y] > map2[x, y] ? map1[x, y] : map2[x, y];
+                        break;
+                    case BlendType.Darken:
+                        blendedMap[x, y] = map1[x, y] < map2[x, y] ? map1[x, y] : map2[x, y];
                         break;
                     default:
                         blendedMap[x, y] = map1[x,y];

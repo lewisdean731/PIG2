@@ -41,15 +41,19 @@ public class TextureGenerator
         {
             for (int x = 0; x < width; x++)
             {
-                if(heightMap[x, y] <= tData.seaLevel)
+                if (heightMap[x, y] == 0 || heightMap[x, y] == 1)
+                {
+                    colourMap[y * width + x] = Color.Lerp(Color.black, Color.white, heightMap[x, y]);
+                } else
+               if (heightMap[x, y] <= tData.seaLevel)
                 {
                     float depth = Mathf.InverseLerp(0, tData.seaLevel, heightMap[x, y]);
                     colourMap[y * width + x] = Color.Lerp(Color.blue, Color.cyan, depth);
                 } else
                 if (heightMap[x, y] >= 0.7f)
                 {
-                    float depth = Mathf.InverseLerp(0.7f, 1, heightMap[x, y]);
-                    colourMap[y * width + x] = Color.Lerp(Color.yellow, Color.red, depth);
+                    float altitude = Mathf.InverseLerp(0.7f, 1, heightMap[x, y]);
+                    colourMap[y * width + x] = Color.Lerp(Color.yellow, Color.red, altitude);
                 }
                 else
                 {

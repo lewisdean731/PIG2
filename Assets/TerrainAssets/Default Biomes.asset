@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c36e5db3b1a8ae4aa3c2ee1b5571087, type: 3}
   m_Name: Default Biomes
   m_EditorClassIdentifier: 
-  autoUpdate: 1
+  autoUpdate: 0
   biomes:
   - biomeType: 0
     humidityGradient:
