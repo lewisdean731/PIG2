@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2184.2024, g: 2332.8772, b: 3514.02, a: 1}
+  m_IndirectSpecularColor: {r: 2184.6868, g: 2336.4807, b: 3528.8794, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -544,6 +544,7 @@ MonoBehaviour:
   noiseData: {fileID: 11400000, guid: db519a5b3b5ac7f4795c213b00ceff67, type: 2}
   terrainData: {fileID: 11400000, guid: 9837038bd7fcb8447a2bbe95779f09bb, type: 2}
   temperatureData: {fileID: 11400000, guid: 887e4f686521d8b4a917fe0f92119d3c, type: 2}
+  erosionData: {fileID: 11400000, guid: eb29ad4269c61274080345aebd92d276, type: 2}
   biomesData: {fileID: 11400000, guid: 71afbde72d55ed94bbe9b1cb3961413b, type: 2}
   terrainMaterial: {fileID: 2100000, guid: 4e7d5725876f5f6408a7faa9350cb251, type: 2}
   mapDisplay: {fileID: 1439351847}

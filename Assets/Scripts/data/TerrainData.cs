@@ -16,24 +16,15 @@ public class TerrainData : UpdateableData
     public float seaLevel = 0.18f;
 
     public float heightMultiplier = 1;
-    public AnimationCurve heightCurve;
+
+    [Range(0, 3)]
+    public float mountainsFactor = 1f;
+    [Range(0f, 1f)]
+    public float mountainsBase = 0.6f;
+    [Range(0f, 1f)]
+    public float mountainsCircumference = 0.6f;
 
     public IslandInfo islandInfo;
-
-    public float minHeight
-    {
-        get
-        {
-            return scale * heightMultiplier * heightCurve.Evaluate(0);
-        }
-    }
-    public float maxHeight
-    {
-        get
-        {
-            return scale * heightMultiplier * heightCurve.Evaluate(1);
-        }
-    }
 }
 
 [System.Serializable]

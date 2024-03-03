@@ -14,9 +14,8 @@ public static class HeightMap
         // generate height noise
         float[,] heightMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, noiseData);
 
-        // add mountain ridges
+        // generate mountain ridges
         (float[,] ridgeMap, float[,] ridgeZoneMap) = GenerateRidgeMap(mapWidth, mapHeight, noiseData);
-        heightMap = Noise.BlendNoiseMaps(heightMap, ridgeMap, BlendType.Add);
 
         // redistribute height if height curve provided
         if (noiseData.redistributionCurve != null)
@@ -27,8 +26,12 @@ public static class HeightMap
         // use square bump to raise center, lower borders (e.g. make an island)
         if (terrainData.islandInfo.isIsland)
         {
-            heightMap = Noise.SquareBump(heightMap, terrainData);
+            heightMap = Noise.SquareBump(heightMap, terrainData.islandInfo.size, terrainData.islandInfo.roundness);
+            ridgeMap = Noise.SquareBump(ridgeMap, terrainData.mountainsBase, terrainData.mountainsCircumference);
         }
+
+        // combine mountains
+        heightMap = Noise.BlendNoiseMaps(heightMap, ridgeMap, BlendType.Add, terrainData.mountainsFactor);
 
         return heightMap;
     }

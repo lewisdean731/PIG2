@@ -70,11 +70,13 @@
     <Compile Include="Assets\Scripts\TerrainMaps.cs" />
     <Compile Include="Assets\Scripts\HeightMap.cs" />
     <Compile Include="Assets\Scripts\Noise.cs" />
+    <Compile Include="Assets\Scripts\data\ErosionData.cs" />
     <Compile Include="Assets\Scripts\BiomeMap.cs" />
     <Compile Include="Assets\Scripts\HumidityMap.cs" />
     <Compile Include="Assets\Scripts\TextureGenerator.cs" />
     <Compile Include="Assets\Scripts\MapDisplay.cs" />
     <Compile Include="Assets\Scripts\data\NoiseData.cs" />
+    <Compile Include="Assets\Scripts\Erosion.cs" />
     <Compile Include="Assets\Scripts\data\BiomesData.cs" />
     <Compile Include="Assets\Scripts\TemperatureMap.cs" />
   </ItemGroup>

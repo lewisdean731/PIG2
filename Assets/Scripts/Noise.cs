@@ -126,7 +126,7 @@ public static class Noise
         return noiseMap;
     }
 
-    public static float[,] SquareBump(float[,] noiseMap, TerrainData tData)
+    public static float[,] SquareBump(float[,] noiseMap, float size, float roundness)
     {
 
         float width = noiseMap.GetLength(0);
@@ -145,14 +145,14 @@ public static class Noise
                 ny = (float)((2 * y) / height) - 1;
 
                 // square bump
-                distance = Mathf.Pow((float)(1 - (1-(nx*nx)) * (1-(ny*ny))), 1 - tData.islandInfo.roundness);
+                distance = Mathf.Pow((float)(1 - (1-(nx*nx)) * (1-(ny*ny))), 1 - roundness);
 
                 float mix = 0;
                 float mixDistance = 0;
 
-                if(distance > tData.islandInfo.size)
+                if(distance > size)
                 {
-                    float i = Mathf.InverseLerp(tData.islandInfo.size, 1, distance);
+                    float i = Mathf.InverseLerp(size, 1, distance);
                     mix = Mathf.Lerp(0, 1, i);
                     mixDistance = Mathf.Lerp(0, 1, i);
                 }

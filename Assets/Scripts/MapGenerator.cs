@@ -10,6 +10,7 @@ public class MapGenerator : MonoBehaviour
     public NoiseData noiseData;
     public TerrainData terrainData;
     public TemperatureData temperatureData;
+    public ErosionData erosionData;
     public BiomesData biomesData;
 
     public Material terrainMaterial;
@@ -44,7 +45,10 @@ public class MapGenerator : MonoBehaviour
     {
         if (!Application.isPlaying)
         {
-            DrawMap();
+            if (autoUpdate)
+            {
+                DrawMap();
+            }
         }
     }
 
@@ -115,9 +119,7 @@ public class MapGenerator : MonoBehaviour
         humidityMap = HumidityMap.GenerateHumidityMap(heightMap, temperatureMap01, noiseData, terrainData, temperatureData);
 
         // hydraulic erosion
-        //
-        // TODO ...
-        //
+        heightMap = Erosion.ApplyHydraulicErosion(heightMap, humidityMap, temperatureMap01, erosionData, terrainData);
 
         // generate biomes
         biomeMap = BiomeMap.GenerateBiomeMap(heightMap, temperatureMap01, humidityMap, noiseData, terrainData, temperatureData, biomeData);
@@ -151,7 +153,12 @@ public class MapGenerator : MonoBehaviour
             temperatureData.onValuesUpdated -= OnValuesUpdated;
             temperatureData.onValuesUpdated += OnValuesUpdated;
         }
-        if (biomesData != null)
+        if (erosionData != null)
+        {
+            erosionData.onValuesUpdated -= OnValuesUpdated;
+            erosionData.onValuesUpdated += OnValuesUpdated;
+        }
+            if (biomesData != null)
         {
             biomesData.onValuesUpdated -= OnValuesUpdated;
             biomesData.onValuesUpdated += OnValuesUpdated;
