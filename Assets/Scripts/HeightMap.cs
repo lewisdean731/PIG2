@@ -38,7 +38,6 @@ public static class HeightMap
 
     public static (float[,], float[,]) GenerateRidgeMap(int width, int height, NoiseData noiseData)
     {
-
         // generate mountain ridge map
         NoiseData ridgeNoiseData = noiseData.ShallowCopy();
         ridgeNoiseData.noiseScale *= 8;
@@ -56,7 +55,6 @@ public static class HeightMap
 
         // scale rides by zone map
         ridgeMap = Noise.BlendNoiseMaps(ridgeMap, ridgeZoneMap, BlendType.Multiply);
-
 
         return (ridgeMap, ridgeZoneMap);
     }

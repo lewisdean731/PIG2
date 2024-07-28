@@ -7,6 +7,7 @@ public class TerrainData : UpdateableData
 {
     [Range(1, 32)]
     public int tileCountX = 4;
+
     [Range(1, 32)]
     public int tileCountY = 4;
 
@@ -19,8 +20,10 @@ public class TerrainData : UpdateableData
 
     [Range(0, 3)]
     public float mountainsFactor = 1f;
+
     [Range(0f, 1f)]
     public float mountainsBase = 0.6f;
+
     [Range(0f, 1f)]
     public float mountainsCircumference = 0.6f;
 
@@ -34,6 +37,7 @@ public class IslandInfo
 
     [Range(0f, 1f)]
     public float size = 0.6f;
+
     [Range(0f, 1f)]
     public float roundness = 0.6f;
 }
