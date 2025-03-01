@@ -222,7 +222,7 @@ MonoBehaviour:
       m_NumAlphaKeys: 2
     gradientEvaluator: 0
     fromHeight: 0.2
-    fromTempC: 29
+    fromTempC: 15
     fromHumidity: 0
   - biomeType: 6
     humidityGradient:
@@ -293,7 +293,7 @@ MonoBehaviour:
     gradientEvaluator: 0
     fromHeight: 0.2
     fromTempC: 25
-    fromHumidity: 0.2
+    fromHumidity: 0.15
   - biomeType: 8
     humidityGradient:
       serializedVersion: 2
@@ -397,8 +397,8 @@ MonoBehaviour:
       m_NumAlphaKeys: 2
     gradientEvaluator: 0
     fromHeight: 0.2
-    fromTempC: 0
-    fromHumidity: 0.25
+    fromTempC: 3
+    fromHumidity: 0.3
   - biomeType: 11
     humidityGradient:
       serializedVersion: 2
@@ -432,7 +432,7 @@ MonoBehaviour:
       m_NumAlphaKeys: 2
     gradientEvaluator: 0
     fromHeight: 0.25
-    fromTempC: 5
+    fromTempC: 6
     fromHumidity: 0.4
   - biomeType: 12
     humidityGradient:
@@ -467,8 +467,8 @@ MonoBehaviour:
       m_NumAlphaKeys: 2
     gradientEvaluator: 0
     fromHeight: 0.25
-    fromTempC: 0
-    fromHumidity: 0.3
+    fromTempC: 4
+    fromHumidity: 0.35
   - biomeType: 13
     humidityGradient:
       serializedVersion: 2
@@ -538,7 +538,7 @@ MonoBehaviour:
     gradientEvaluator: 0
     fromHeight: 0.2
     fromTempC: -10
-    fromHumidity: 0.1
+    fromHumidity: 0.2
   - biomeType: 15
     humidityGradient:
       serializedVersion: 2
@@ -608,7 +608,7 @@ MonoBehaviour:
     gradientEvaluator: 0
     fromHeight: 0.4
     fromTempC: -4
-    fromHumidity: 0.1
+    fromHumidity: 0.25
   - biomeType: 17
     humidityGradient:
       serializedVersion: 2
@@ -678,4 +678,4 @@ MonoBehaviour:
     gradientEvaluator: 0
     fromHeight: 0.9
     fromTempC: -40
-    fromHumidity: 0
+    fromHumidity: 0.1

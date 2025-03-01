@@ -1,24 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+using System.Collections.Generic;
+
+#if UNITY_EDITOR
+
+using UnityEditor;
+
+#endif
 
 public static class Erosion
 {
-    public static float[,] ApplyHydraulicErosion(float[,] heightMap, float[,] humidityMap, float[,] temperatureMap, ErosionData eData, TerrainData tData)
+    public static float[,] ApplyHydraulicErosion(
+        float[,] heightMap,
+        float[,] humidityMap,
+        float[,] temperatureMap,
+        ErosionData eData,
+        TerrainData tData)
     {
         int currentCycle = 0;
         for (int i = 0; i < eData.cycles; i++)
         {
 #if UNITY_EDITOR
-            EditorUtility.DisplayProgressBar("Applying Hydraulic Erosion", "Processing Cycle " + currentCycle + "/" + eData.cycles + "...", (float)currentCycle / (float)eData.cycles);
+            EditorUtility.DisplayProgressBar(
+                "Applying Hydraulic Erosion",
+                "Processing Cycle " + currentCycle + "/" + eData.cycles + "...",
+                (float)currentCycle / (float)eData.cycles);
 #endif
             for (int j = 0; j < eData.runsPerCycle; j++)
             {
-                for (int k = 0; k < eData.runsPerCycle; k++)
-                {
-                    heightMap = ApplyHydraulicErosionRun(heightMap, humidityMap, temperatureMap, eData, tData);
-                }
+                heightMap =
+                    ApplyHydraulicErosionRun(heightMap, humidityMap, eData, tData);
             }
             currentCycle++;
         }
@@ -28,60 +38,220 @@ public static class Erosion
         return heightMap;
     }
 
-    static float[,] ApplyHydraulicErosionRun(float[,] heightMap, float[,] humidityMap, float[,] temperatureMap, ErosionData eData, TerrainData tData)
+    private static float[,] ApplyHydraulicErosionRun(
+    float[,] heightMap, float[,] humidityMap, ErosionData eData,
+    TerrainData tData)
     {
+        int width = heightMap.GetLength(0);
+        int height = heightMap.GetLength(1);
+
         Vector2 currentPos = GetRandomPointOnMap(heightMap, tData.seaLevel);
         Vector2 prevPos = currentPos;
-        int cpx = (int)currentPos.x;
-        int cpy = (int)currentPos.y;
-        float size = 0.00f;
-        float sizeThreshold = 0.06f;
-        float slopeThreshold = 0.005f;
-        float erodePercent = 0.03f;
+        int cpx = Mathf.FloorToInt(currentPos.x);
+        int cpy = Mathf.FloorToInt(currentPos.y);
+
+        // Get humidity at the starting point
+        float humidity = humidityMap[cpx, cpy];
+
+        // Use humidity to influence initial water volume
+        float water = 1f + humidity * eData.humidityWaterMultiplier;
+
+        float sediment = 0f; // Initial sediment volume
 
         for (int i = 0; i < eData.stepsPerRun; i++)
         {
-            // work out where to go next
-            Vector2 nextPos = GetLowestNeighbour(heightMap, currentPos, prevPos);
-            int npx = (int)nextPos.x;
-            int npy = (int)nextPos.y;
+            cpx = Mathf.FloorToInt(currentPos.x);
+            cpy = Mathf.FloorToInt(currentPos.y);
 
-            float slope = heightMap[cpx, cpy] - heightMap[npx, npy];
-            // do erosion for current point
-            // pick up material (erode) if below size / slope threshold
-            if (size < sizeThreshold)
+            // Ensure the current position is within bounds
+            if (cpx < 0 || cpx >= width || cpy < 0 || cpy >= height)
             {
-                size += slope * erodePercent;
-                heightMap[cpx, cpy] -= slope * erodePercent;
-            }
-            // drop off material (deposit) if above size / slope threshold
-            else
-            {
-                size -= size * erodePercent;
-                heightMap[cpx, cpy] += size * erodePercent;
+                break; // Stop if out of bounds
             }
 
-            if (heightMap[npx, npy] < tData.seaLevel) break;
+            // Find neighboring cells and their height differences
+            List<NeighborData> neighbors = GetNeighborsWithHeightDifferences(
+                heightMap, currentPos, prevPos);
 
-            prevPos = currentPos;
-            currentPos = nextPos;
+            // Calculate total height difference for normalization
+            float totalHeightDifference = 0;
+            foreach (var neighbor in neighbors)
+            {
+                totalHeightDifference += neighbor.HeightDifference;
+            }
+
+            // Distribute water and sediment to neighbors based on height difference
+            foreach (var neighbor in neighbors)
+            {
+                int npx = neighbor.X;
+                int npy = neighbor.Y;
+
+                // Calculate the proportion of water and sediment to transfer
+                float proportion = totalHeightDifference > 0
+                                       ? neighbor.HeightDifference / totalHeightDifference
+                                       : 1f / neighbors.Count; // Distribute evenly if
+                                                               // flat
+
+                // Calculate sediment capacity based on flow (proportional water volume)
+                float sedimentCapacity = Mathf.Max(0, neighbor.HeightDifference) *
+                                         water * proportion * eData.capacityFactor;
+
+                // Erosion/Deposition logic
+                if (sediment > sedimentCapacity)
+                {
+                    // Deposition: Deposit sediment where capacity is lower
+                    float depositAmount =
+                        (sediment - sedimentCapacity) * eData.depositSpeed;
+                    depositAmount = Mathf.Min(depositAmount, heightMap[npx, npy]);
+                    heightMap[npx, npy] += depositAmount;
+                    sediment -= depositAmount;
+                }
+                else
+                {
+                    // Erosion: Pick up sediment where capacity is higher
+                    float erodeAmount =
+                        Mathf.Min((sedimentCapacity - sediment) * eData.erosionSpeed,
+                                  heightMap[cpx, cpy]);
+                    heightMap[cpx, cpy] -= erodeAmount;
+                    sediment += erodeAmount;
+                }
+
+                // Transport sediment downstream (proportional to water volume)
+                float sedimentTransferAmount =
+                    Mathf.Min(sediment, eData.transportSpeed * water * proportion);
+                sediment -= sedimentTransferAmount;
+                // The sediment is effectively moved to the neighbor in the next iteration
+            }
+
+            // Evaporation: Reduce water volume
+            water *= (1 - eData.evaporationRate);
+
+            // Stop if water volume is too low
+            if (water <= 0)
+            {
+                break;
+            }
+
+            // Choose the next position randomly from the neighbors, weighted by
+            // height difference
+            if (neighbors.Count != 0)
+            {
+                // Keep the same position if no neighbours to move to
+                currentPos = ChooseNextPosition(neighbors, totalHeightDifference);
+            }
+
+            cpx = Mathf.FloorToInt(currentPos.x);
+            cpy = Mathf.FloorToInt(currentPos.y);
+
+            prevPos = new Vector2(cpx, cpy);
+
+            // Optionally stop if we hit sea level
+            if (heightMap[cpx, cpy] < tData.seaLevel && !eData.simulateInWater)
+            {
+                break;
+            }
         }
 
         return heightMap;
     }
 
+    // Helper class to store neighbor data
+    public class NeighborData
+    {
+        public int X;
+        public int Y;
+        public float HeightDifference;
+    }
 
-    public static Vector2 GetRandomPointOnMap(float[,] map, float minValue = 0, float maxValue = 1)
+    // Function to get neighbors with height differences
+    private static List<NeighborData> GetNeighborsWithHeightDifferences(
+        float[,] map, Vector2 c, Vector2 p)
+    {
+        int width = map.GetLength(0);
+        int height = map.GetLength(1);
+
+        int x = Mathf.FloorToInt(c.x);
+        int y = Mathf.FloorToInt(c.y);
+
+        List<NeighborData> neighbors = new List<NeighborData>();
+
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                if (i == 0 && j == 0) continue; // Skip the current cell
+
+                int nx = x + i;
+                int ny = y + j;
+
+                // Check bounds
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height)
+                {
+                    // Skip the previous position to avoid going back directly
+                    if (nx == Mathf.FloorToInt(p.x) && ny == Mathf.FloorToInt(p.y))
+                        continue;
+
+                    float heightDifference = map[x, y] - map[nx, ny];
+                    if (heightDifference > 0)
+                    { // Only consider neighbors lower than the
+                      // current cell
+                        neighbors.Add(new NeighborData
+                        {
+                            X = nx,
+                            Y = ny,
+                            HeightDifference = heightDifference
+                        });
+                    }
+                }
+            }
+        }
+
+        return neighbors;
+    }
+
+    // Function to choose the next position based on height differences
+    private static Vector2 ChooseNextPosition(List<NeighborData> neighbors,
+                                     float totalHeightDifference)
+    {
+        if (neighbors.Count == 0)
+        {
+            return Vector2.negativeInfinity; // No valid neighbors
+        }
+
+        float randomValue = Random.value;
+        float cumulativeProbability = 0;
+
+        for (int i = 0; i < neighbors.Count; i++)
+        {
+            float probability = totalHeightDifference > 0
+                                    ? neighbors[i].HeightDifference / totalHeightDifference
+                                    : 1f / neighbors.Count;
+            cumulativeProbability += probability;
+            if (randomValue <= cumulativeProbability)
+            {
+                return new Vector2(neighbors[i].X, neighbors[i].Y);
+            }
+        }
+
+        // Fallback: return the last neighbor if something goes wrong
+        return new Vector2(neighbors[neighbors.Count - 1].X,
+                           neighbors[neighbors.Count - 1].Y);
+    }
+
+    public static Vector2 GetRandomPointOnMap(float[,] map, float minValue = 0)
     {
         int width = map.GetLength(0);
         int height = map.GetLength(1);
 
         while (true)
         {
-        int x = Random.Range(0, width);
-        int y = Random.Range(0, height);
+            int x = Random.Range(0, width);
+            int y = Random.Range(0, height);
 
-        if (map[x,y] >= minValue && map[x,y] <= maxValue) return new Vector2(x,y);
+            if (map[x, y] >= minValue)
+            {
+                return new Vector2(x, y);
+            }
         }
     }
 
@@ -90,56 +260,37 @@ public static class Erosion
         int width = map.GetLength(0);
         int height = map.GetLength(1);
 
-        int x = (int)c.x;
-        int y = (int)c.y;
-        float tl = x > 0 && y < height ? map[x - 1, y + 1] : float.MaxValue;
-        float tm = x >= 0 && y < height ? map[x, y + 1] : float.MaxValue;
-        float tr = x < width && y < height ? map[x + 1, y + 1] : float.MaxValue;
-        float mr = x > 0 && y < height ? map[x + 1, y] : float.MaxValue;
-        float br = x > 0 && y < height ? map[x + 1, y - 1] : float.MaxValue;
-        float bm = x > 0 && y < height ? map[x, y - 1] : float.MaxValue;
-        float bl = x > 0 && y < height ? map[x - 1, y - 1] : float.MaxValue;
-        float ml = x > 0 && y < height ? map[x - 1, y] : float.MaxValue;
+        int x = Mathf.FloorToInt(c.x);
+        int y = Mathf.FloorToInt(c.y);
 
-        float lowestValue = tl;
-        Vector2 lowestPoint = new Vector2(x - 1, y + 1);
+        float lowestValue = float.MaxValue;
+        Vector2 lowestPoint = c; // Default to current position
 
-        if (tm < lowestValue && c != p)
+        for (int i = -1; i <= 1; i++)
         {
-            lowestValue = tm;
-            lowestPoint = new Vector2(x, y + 1);
-        }
-        if (tr < lowestValue && c != p)
-        {
-            lowestValue = tr;
-            lowestPoint = new Vector2(x + 1, y + 1);
-        }
-        if (mr < lowestValue && c != p)
-        {
-            lowestValue = mr;
-            lowestPoint = new Vector2(x + 1, y);
-        }
-        if (br < lowestValue && c != p)
-        {
-            lowestValue = br;
-            lowestPoint = new Vector2(x + 1, y - 1);
-        }
-        if (bm < lowestValue && c != p)
-        {
-            lowestValue = bm;
-            lowestPoint = new Vector2(x, y - 1);
-        }
-        if (bl < lowestValue && c != p)
-        {
-            lowestValue = bl;
-            lowestPoint = new Vector2(x - 1, y - 1);
-        }
-        if (ml < lowestValue && c != p)
-        {
-            lowestPoint = new Vector2(x - 1, y);
+            for (int j = -1; j <= 1; j++)
+            {
+                if (i == 0 && j == 0) continue; // Skip the current cell
+
+                int nx = x + i;
+                int ny = y + j;
+
+                // Check bounds
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height)
+                {
+                    // Skip the previous position to avoid going back
+                    if (nx == Mathf.FloorToInt(p.x) && ny == Mathf.FloorToInt(p.y))
+                        continue;
+
+                    if (map[nx, ny] < lowestValue)
+                    {
+                        lowestValue = map[nx, ny];
+                        lowestPoint = new Vector2(nx, ny);
+                    }
+                }
+            }
         }
 
         return lowestPoint;
-
     }
 }

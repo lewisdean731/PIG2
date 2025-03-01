@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9e1360261051d3448c55e00a714997d, type: 3}
   m_Name: Default Terrain
   m_EditorClassIdentifier: 
-  autoUpdate: 1
+  autoUpdate: 0
   tileCountX: 4
   tileCountY: 4
   scale: 1
@@ -20,8 +20,8 @@ MonoBehaviour:
   heightMultiplier: 1
   mountainsFactor: 1
   mountainsBase: 0.5
-  mountainsCircumference: 0.891
+  mountainsCircumference: 0.8
   islandInfo:
-    isIsland: 1
+    isIsland: 0
     size: 0.6
     roundness: 0.8

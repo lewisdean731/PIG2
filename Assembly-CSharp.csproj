@@ -72,6 +72,7 @@
     <Compile Include="Assets\Scripts\Noise.cs" />
     <Compile Include="Assets\Scripts\data\ErosionData.cs" />
     <Compile Include="Assets\Scripts\BiomeMap.cs" />
+    <Compile Include="Assets\Scripts\data\ClimateData.cs" />
     <Compile Include="Assets\Scripts\HumidityMap.cs" />
     <Compile Include="Assets\Scripts\TextureGenerator.cs" />
     <Compile Include="Assets\Scripts\MapDisplay.cs" />

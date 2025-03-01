@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
 {
-
     public NoiseData noiseData;
     public TerrainData terrainData;
     public TemperatureData temperatureData;
@@ -18,9 +17,10 @@ public class MapGenerator : MonoBehaviour
     public MapDisplay mapDisplay;
 
     [SerializeField]
-
     public TerrainMaps terrainMaps;
-    public enum DrawMode { 
+
+    public enum DrawMode
+    {
         ColorMap,
         HeightMap,
         HeightMapRGB,
@@ -31,17 +31,19 @@ public class MapGenerator : MonoBehaviour
         BiomeMap,
         WaterMouintainMap
     };
+
     public DrawMode drawMode;
-    
+
     public bool autoUpdate;
+    public bool regenerateTerrainMaps;
 
     // Start is called before the first frame update
-    void Awake()
+    private void Awake()
     {
         DrawMap();
     }
 
-    void OnValuesUpdated()
+    private void OnValuesUpdated()
     {
         if (!Application.isPlaying)
         {
@@ -54,7 +56,11 @@ public class MapGenerator : MonoBehaviour
 
     public void DrawMap()
     {
-        terrainMaps = GenerateTerrainMaps(noiseData, terrainData, temperatureData, biomesData);
+        if (regenerateTerrainMaps || terrainMaps == null)
+        {
+            terrainMaps = GenerateTerrainMaps(noiseData, terrainData, temperatureData, biomesData);
+        }
+
         (float[,] heightMap, float[,] temperatureMap, float[,] temperatureMap01, float[,] humidityMap, BiomeType[,] biomeMap) = terrainMaps;
 
         switch (drawMode)
@@ -63,31 +69,40 @@ public class MapGenerator : MonoBehaviour
                 Debug.Log("Draw ColorMap not implemented");
                 // mapDisplay.DrawTexture(TextureGenerator.FromHeightMap(heightMap));
                 break;
+
             case DrawMode.HeightMap:
                 mapDisplay.DrawTexture(TextureGenerator.FromHeightMap(heightMap));
                 break;
+
             case DrawMode.HeightMapRGB:
                 mapDisplay.DrawTexture(TextureGenerator.FromEquatorMap(heightMap, temperatureData));
                 break;
+
             case DrawMode.TemperatureMap:
                 mapDisplay.DrawTexture(TextureGenerator.FromTemperatureMap(temperatureMap, temperatureData));
                 break;
+
             case DrawMode.EquatorMap:
                 Debug.Log("Draw EquatorMap not implemented");
                 // mapDisplay.DrawTexture(TextureGenerator.FromEquatorMap(heightMap, temperatureData));
                 break;
+
             case DrawMode.HumidityMap:
                 mapDisplay.DrawTexture(TextureGenerator.FromHumiditiyMap(humidityMap));
                 break;
+
             case DrawMode.RawBiomeMap:
                 mapDisplay.DrawTexture(TextureGenerator.FromRawBiomeMap(biomeMap, biomesData));
                 break;
+
             case DrawMode.BiomeMap:
                 mapDisplay.DrawTexture(TextureGenerator.FromBiomeMap(biomeMap, biomesData, humidityMap, temperatureMap01));
                 break;
+
             case DrawMode.WaterMouintainMap:
                 mapDisplay.DrawTexture(TextureGenerator.WaterMouintainMap(heightMap, terrainData));
                 break;
+
             default:
                 break;
         }
@@ -111,7 +126,6 @@ public class MapGenerator : MonoBehaviour
         // generate height noise
         heightMap = HeightMap.GenerateHeightMap(noiseData, terrainData);
 
-
         // generate temperature map
         (temperatureMap, temperatureMap01) = TemperatureMap.GenerateTemperatureMaps(heightMap, terrainData, temperatureData);
 
@@ -134,12 +148,12 @@ public class MapGenerator : MonoBehaviour
         return terrainMaps;
     }
 
-    void OnValidate()
+    private void OnValidate()
     {
         if (terrainData != null)
         {
-            // unsub and resub so we don't start adding multiple subscriptions every update
-            // camera controller probably does this better?
+            // unsub and resub so we don't start adding multiple subscriptions
+            // every update camera controller probably does this better?
             terrainData.onValuesUpdated -= OnValuesUpdated;
             terrainData.onValuesUpdated += OnValuesUpdated;
         }
@@ -158,7 +172,7 @@ public class MapGenerator : MonoBehaviour
             erosionData.onValuesUpdated -= OnValuesUpdated;
             erosionData.onValuesUpdated += OnValuesUpdated;
         }
-            if (biomesData != null)
+        if (biomesData != null)
         {
             biomesData.onValuesUpdated -= OnValuesUpdated;
             biomesData.onValuesUpdated += OnValuesUpdated;

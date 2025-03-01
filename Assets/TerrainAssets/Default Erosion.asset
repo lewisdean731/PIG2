@@ -12,9 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9800cc11638e2eb419d6f63a56021a8c, type: 3}
   m_Name: Default Erosion
   m_EditorClassIdentifier: 
-  autoUpdate: 1
+  autoUpdate: 0
   simulateInWater: 0
-  cycles: 100
-  runsPerCycle: 100
-  stepsPerRun: 50
-  percentLossPerStep: 0.03
+  cycles: 500
+  runsPerCycle: 300
+  stepsPerRun: 500
+  capacityFactor: 0.5
+  erosionSpeed: 0.2
+  depositSpeed: 0.2
+  evaporationRate: 0.01
+  transportSpeed: 0.2
+  humidityWaterMultiplier: 1
